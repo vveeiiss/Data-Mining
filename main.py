@@ -1,4 +1,5 @@
 import numpy as np
+import pandas
 from sklearn.model_selection import StratifiedKFold
 from get_data import get_data
 from sklearn.decomposition import PCA
@@ -38,7 +39,6 @@ def pre_process(x_train , x_test):
 
 	pca = PCA (n_components = 0.99 ,  svd_solver = "full")
 	pca.fit(x_train)
-	print("preprocess DONE!")
 	return pca.inverse_transform(pca.transform(x_train)) , pca.inverse_transform(pca.transform(x_test))
 
 
@@ -89,28 +89,29 @@ def sampling(x,y,subsample_size=1):
 def fit(x_train, y_train, x_test, y_test, clfs):
 	res = []
 	for clf in clfs:
-		sampled_x,sampled_y = sampling(x_train , y_train , 0.1)
-		clf.fit(sampled_x,sampled_y)
+		clf.fit(x_train,y_train)
 		y = clf.predict(x_test)
 
 
 def classifying(x_train, y_train, x_test, y_test):
 	Allclfs = [
 		GaussianNB(),
+
 		LogisticRegression(penalty='l2', C=10, solver='lbfgs'),
 		LogisticRegression(penalty='l2', C=100.0, solver='lbfgs'),
-		GradientBoostingClassifier(),
+
 		KNeighborsClassifier(n_neighbors=4),
 		KNeighborsClassifier(n_neighbors=32),
-		AdaBoostClassifier(n_estimators=80, learning_rate=0.1),
-		RandomForestClassifier(n_estimators=10, max_depth=10),
+		
+		
 		RandomForestClassifier(n_estimators=10, criterion='entropy', max_depth=10),
 		RandomForestClassifier(n_estimators=50, criterion='entropy', max_depth=5),
-		RandomForestClassifier(n_estimators=10, max_depth=5),
-		MLPClassifier(hidden_layer_sizes=(128, 32), max_iter=200),
-		MLPClassifier(hidden_layer_sizes=(256, 128, 64, 16), max_iter=200),
+		
+		AdaBoostClassifier(n_estimators=80, learning_rate=0.1),
+
 		GradientBoostingClassifier(learning_rate=0.1, n_estimators=50),
 		GradientBoostingClassifier(learning_rate=0.01, n_estimators=80),
+
 		SVC(C=1.0, gamma='auto', probability=True),
 		SVC(C=10.0, gamma='auto', probability=True),
 
@@ -151,11 +152,7 @@ def CNN(x_train  , y_train , x_test , y_test):
 def main():
 	x_data , y_data , y_data_labels= get_data()
 	
-	print("readmission--> 0 , HbA1C--> 1 , Diag1--> 2")
-	i = int(input("Choose a number"))
-	y_data = y_data[i]
-	print("please wait...")
-	print("this may take few minutes")
+
 
 	total_accuracy = 0
 	cnt = 1
@@ -179,7 +176,7 @@ def main():
 		print("Accuracy of " + str(cnt) + " = " , accuracy )
 		cnt+=1
 
-	total_accuracy/=number_of_folds
+	total_accuracy/=Nfolds
 
 	print("final accuracy  = ", total_accuracy)
 
