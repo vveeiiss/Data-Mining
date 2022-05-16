@@ -14,7 +14,7 @@ from sklearn.naive_bayes import GaussianNB
 from sklearn.ensemble import AdaBoostClassifier,GradientBoostingClassifier
 from sklearn.ensemble import VotingClassifier
 from copy import deepcopy
-import keras
+
 from keras.models import Sequential
 from keras.layers import Dense, Activation, Dropout
 from keras.callbacks import EarlyStopping
