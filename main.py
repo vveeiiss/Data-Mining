@@ -9,11 +9,7 @@ from sklearn.ensemble import RandomForestClassifier
 from sklearn.ensemble import GradientBoostingClassifier
 from sklearn.neighbors import KNeighborsClassifier
 from sklearn.svm import SVC
-from sklearn.neighbors import RadiusNeighborsClassifier
 from sklearn.neighbors import KNeighborsClassifier
-from sklearn.pipeline import Pipeline
-from sklearn.utils.random import sample_without_replacement
-from sklearn.neural_network import MLPClassifier
 from sklearn.naive_bayes import GaussianNB
 from sklearn.ensemble import AdaBoostClassifier,GradientBoostingClassifier
 from sklearn.ensemble import VotingClassifier
@@ -49,41 +45,6 @@ def predict(x, clfs):
 
 	res = np.concatenate(res , axis = 1)
 	return res
-
-
-def sampling(x,y,subsample_size=1):
-
-    class_xs = []
-    min_elems = None
-
-    for yi in np.unique(y):
-        elems = x[(y == yi)]
-        class_xs.append((yi, elems))
-        if min_elems == None or elems.shape[0] < min_elems:
-            min_elems = elems.shape[0]
-
-    use_elems = min_elems
-    if subsample_size < 1:
-        use_elems = int(min_elems*subsample_size)
-
-    xs = []
-    ys = []
-
-    for ci,this_xs in class_xs:
-        if len(this_xs) > use_elems:
-            np.random.shuffle(this_xs)
-
-        x_ = this_xs[:use_elems]
-        y_ = np.empty(use_elems)
-        y_.fill(ci)
-
-        xs.append(x_)
-        ys.append(y_)
-
-    xs = np.concatenate(xs)
-    ys = np.concatenate(ys)
-
-    return xs,ys
 
 
 def fit(x_train, y_train, x_test, y_test, clfs):
@@ -149,36 +110,35 @@ def CNN(x_train  , y_train , x_test , y_test):
 	return clf.evaluate(x_test , y_test)[1]
 
 
-def main():
-	x_data , y_data , y_data_labels= get_data()
+
+x_data , y_data = get_data()
 	
 
 
-	total_accuracy = 0
-	cnt = 1
-	Nfolds = 10  # this can be changed
+total_accuracy = 0
+cnt = 1
+Nfolds = 10  # this can be changed
 
-	kf = StratifiedKFold(n_splits=Nfolds , shuffle  = True)
+kf = StratifiedKFold(n_splits=Nfolds , shuffle  = True)
 	
-	for train_index, test_index in kf.split(x_data, y_data):
+for train_index, test_index in kf.split(x_data, y_data):
 
-		X_train, X_test = x_data[train_index], x_data[test_index]
-		y_train, y_test = y_data[train_index], y_data[test_index]
-		X_train , X_test = pre_process(X_train , X_test)
-		X_train, X_test = normalizer(X_train, X_test)
-		X_train, X_test = classifying(X_train, y_train, X_test, y_test)
-		X_train , X_test = pre_process(X_train , X_test)
-		X_train, X_test = normalizer(X_train, X_test)
+	X_train, X_test = x_data[train_index], x_data[test_index]
+	y_train, y_test = y_data[train_index], y_data[test_index]
+	X_train , X_test = pre_process(X_train , X_test)
+	X_train, X_test = normalizer(X_train, X_test)
+	X_train, X_test = classifying(X_train, y_train, X_test, y_test)
+	X_train , X_test = pre_process(X_train , X_test)
+	X_train, X_test = normalizer(X_train, X_test)
 
-		accuracy = CNN(X_train, y_train, X_test, y_test)
+	accuracy = CNN(X_train, y_train, X_test, y_test)
 		
-		total_accuracy += accuracy
-		print("Accuracy of " + str(cnt) + " = " , accuracy )
-		cnt+=1
+	total_accuracy += accuracy
+	print("Accuracy of " + str(cnt) + " = " , accuracy )
+	cnt+=1
 
-	total_accuracy/=Nfolds
+total_accuracy/=Nfolds
 
-	print("final accuracy  = ", total_accuracy)
+print("final accuracy  = ", total_accuracy)
 
-if __name__ == '__main__':
-	main()
+
