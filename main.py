@@ -19,8 +19,8 @@ from keras.models import Sequential
 from keras.layers import Dense, Activation, Dropout
 from keras.callbacks import EarlyStopping
 from sklearn.linear_model import LogisticRegression
-from keras.utils import to_categorical
-from keras.utils import plot_model
+from tensorflow.keras.utils import to_categorical
+from keras.utils.vis_utils import plot_model
 
 
 def normalizer(x_train , x_test):
@@ -125,10 +125,10 @@ for train_index, test_index in kf.split(x_data, y_data):
 
 	X_train, X_test = x_data[train_index], x_data[test_index]
 	y_train, y_test = y_data[train_index], y_data[test_index]
-	X_train , X_test = pre_process(X_train , X_test)
+	#X_train , X_test = pre_process(X_train , X_test)
 	X_train, X_test = normalizer(X_train, X_test)
 	X_train, X_test = classifying(X_train, y_train, X_test, y_test)
-	X_train , X_test = pre_process(X_train , X_test)
+	#X_train , X_test = pre_process(X_train , X_test)
 	X_train, X_test = normalizer(X_train, X_test)
 
 	accuracy = CNN(X_train, y_train, X_test, y_test)
